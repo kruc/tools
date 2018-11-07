@@ -70,10 +70,12 @@ if [ ! -f "$HPV_CACHED_LOGS_DIR/$HPV_FILE" ]; then
 
 	echo "$HPV_FILE not found in cache - analyzing git logs..."
 	mkdir -p $HPV_CACHED_LOGS_DIR
-	git --git-dir $HPV_HOMEBREW_REPO_DIR/.git log --pretty=tformat:'%H %s' master -- Formula/$HPV_FILE | grep -wE "($HPV_FORMULA \d+.\d+.\d+$)" >$HPV_CACHED_LOGS_DIR/$HPV_FILE
+	git --git-dir $HPV_HOMEBREW_REPO_DIR/.git log --pretty=tformat:'%H %s' master -- Formula/$HPV_FILE > $HPV_CACHED_LOGS_DIR/$HPV_FILE
 fi
 
 tput setaf 2
 cat $HPV_CACHED_LOGS_DIR/$HPV_FILE |
-	awk '{printf "brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/%s/Formula/%s.rb for version %s\n", $1, $2, $3}' |
+	grep -wE "($HPV_FORMULA: update \d+.\d+.\d+ bottle\.$)" |
+	sed "s/$HPV_FORMULA:/$HPV_FORMULA/g" |
+	awk '{printf "brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/%s/Formula/%s.rb for version %s\n", $1, $2, $4}' |
 	grep -wE "($HPV_VERSION)"
