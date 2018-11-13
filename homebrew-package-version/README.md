@@ -90,29 +90,29 @@ To enable global use of `hpv` command:
     ```
 
 ## Autocomplete configuration
-* #### ZSH
-    1. Copy `./completion/zsh/_hpv` file to  `~/.zsh/completion/_hpv`
-    1. Put following configuration into `~/.zshrc`
-    ```
-    fpath=(~/.zsh/completion $fpath)
-    # compsys initialization
-    autoload -U compinit
-    compinit
+#### ZSH
+1. Copy `./completion/zsh/_hpv` file to  `~/.zsh/completion/_hpv`
+1. Put following configuration into `~/.zshrc`
+```
+fpath=(~/.zsh/completion $fpath)
+# compsys initialization
+autoload -U compinit
+compinit
 
-    # show completion menu when number of options is at least 2
-    zstyle ":completion:*:descriptions" format "%B%d%b"
-    zstyle ':completion:*' menu select=2
+# show completion menu when number of options is at least 2
+zstyle ":completion:*:descriptions" format "%B%d%b"
+zstyle ':completion:*' menu select=2
 
-    # GLOBAL HPV CONFIGURATION
-    export HPV_SOURCE=[YOUR_PATH]/homebrew-package-version
+# GLOBAL HPV CONFIGURATION
+export HPV_SOURCE=[YOUR_PATH]/homebrew-package-version
 
-    # HPV AUTOCOMPLETE CONFIGURATION
-    export HPV_HOMEBREW_REPO_DIR=$HPV_SOURCE/.homebrew-core
-    export HPV_CACHED_LOGS_DIR=$HPV_SOURCE/.cached-logs
-    ```
+# HPV AUTOCOMPLETE CONFIGURATION
+export HPV_HOMEBREW_REPO_DIR=$HPV_SOURCE/.homebrew-core
+export HPV_CACHED_LOGS_DIR=$HPV_SOURCE/.cached-logs
+```
 ## How does it work?
 
-1. Check if `homebrew-core` repository exists, if not it will be cloned into configured by `HPV_HOMEBREW_REPO_DIR` param directory (default `$HPV_SOURCE/.homebrew-core`)
+1. Checks if `homebrew-core` repository exists, if not it will be cloned into configured by `HPV_HOMEBREW_REPO_DIR` param directory (default `$HPV_SOURCE/.homebrew-core`)
 1. Check if formula exists in brew (`brew info [formula]`)
 1. Analyzing given formula `git log`s
 1. Create logs cache for the package you are looking for in `HPV_CACHED_LOGS_DIR` (default `$HPV_SOURCE/.cached-logs`)
