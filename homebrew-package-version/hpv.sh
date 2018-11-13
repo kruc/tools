@@ -1,12 +1,13 @@
 #!/bin/bash
 # Default config
-HPV_HOMEBREW_REPO_DIR=${HPV_HOMEBREW_REPO_DIR:-$PWD/.homebrew-core}
-HPV_CACHED_LOGS_DIR=${HPV_CACHED_LOGS_DIR:-$PWD/.cached-logs}
+HPV_SOURCE=${HPV_SOURCE:-$PWD}
+HPV_HOMEBREW_REPO_DIR=${HPV_HOMEBREW_REPO_DIR:-$HPV_SOURCE/.homebrew-core}
+HPV_CACHED_LOGS_DIR=${HPV_CACHED_LOGS_DIR:-$HPV_SOURCE/.cached-logs}
 HPV_PULL_INTERVAL=${HPV_PULL_INTERVAL:-3600}
 
 # Internal variable
 CURRENT_TIMESTAMP=$(date +%s)
-PULL_LOG_FILE=.pull-log-file
+PULL_LOG_FILE=$HPV_SOURCE/.pull-log-file
 
 if [ ! -f $PULL_LOG_FILE ]; then
 	echo $CURRENT_TIMESTAMP >$PULL_LOG_FILE
@@ -23,7 +24,7 @@ else
 	HPV_FORMULA=$1
 fi
 
-HPV_FILE=$HPV_FORMULA.rb
+HPV_FILE=$HPV_FORMULA
 
 # HPV_VERSION=${HPV_VERSION:- }
 if [ -z ${2} ]; then
@@ -70,12 +71,12 @@ if [ ! -f "$HPV_CACHED_LOGS_DIR/$HPV_FILE" ]; then
 
 	echo "$HPV_FILE not found in cache - analyzing git logs..."
 	mkdir -p $HPV_CACHED_LOGS_DIR
-	git --git-dir $HPV_HOMEBREW_REPO_DIR/.git log --pretty=tformat:'%H %s' master -- Formula/$HPV_FILE > $HPV_CACHED_LOGS_DIR/$HPV_FILE
+	git --git-dir $HPV_HOMEBREW_REPO_DIR/.git log --pretty=tformat:'%H %s' master -- Formula/$HPV_FILE.rb > $HPV_CACHED_LOGS_DIR/$HPV_FILE
 fi
 
 tput setaf 2
 cat $HPV_CACHED_LOGS_DIR/$HPV_FILE |
 	grep -wE "($HPV_FORMULA: update \d+.\d+.\d+ bottle\.$)" |
 	sed "s/$HPV_FORMULA:/$HPV_FORMULA/g" |
-	awk '{printf "brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/%s/Formula/%s.rb for version %s\n", $1, $2, $4}' |
+	awk '{printf "brew unlink %s && brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/%s/Formula/%s.rb for version %s\n", $2, $1, $2, $4}' |
 	grep -wE "($HPV_VERSION)"

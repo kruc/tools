@@ -1,0 +1,24 @@
+#compdef hpv
+
+_hpv() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments \
+        '1: :->package'\
+        '*: :->version'
+
+    case $state in
+    package)
+        _arguments "1:Packages:(`ls $HPV_HOMEBREW_REPO_DIR/formula | grep -oE '(.+)[^.rb]'`)"
+    ;;
+    version)
+        if [ -f $HPV_CACHED_LOGS_DIR/$words[2] ] ; then
+            compadd "$@" `cat $HPV_CACHED_LOGS_DIR/$words[2] | grep -wE '(update \d+.\d+.\d+ bottle)' | awk '{print $4}'`
+        fi
+    ;;
+    *)
+    esac
+}
+
+_hpv "$@"
